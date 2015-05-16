@@ -18,7 +18,8 @@ Process/transform the data (if necessary) into a format suitable for your analys
 I transfer the data table from read.csv into a dplyr data frame that I will use later.  
 I am using the suppress functions to keep the dplyr load from issuing warnings and other messages.*
 
-```{r dataload,echo=TRUE}
+
+```r
 dtAct <- read.csv('activity.csv')
 suppressWarnings(suppressPackageStartupMessages(library(dplyr)));
 dfAct <- tbl_df(dtAct)
@@ -37,16 +38,22 @@ I am using a base histogram with an arbitrary number of breaks to show frequency
 Finally, I am making the assumption we want to see the mean and median across all the step totals  
 (as opposed to a big table showing the mean and median of each day's total).*
 
-```{r totalsteps,echo=TRUE}
+
+```r
 dfTot <- dfAct %>% group_by(date) %>% summarise(total_steps=sum(steps))
 with(dfTot,hist(total_steps,breaks=22,col="blue",main="Total Steps Frequency",xlab="Total Steps",ylab="Frequency"))
+```
+
+![plot of chunk totalsteps](figure/totalsteps-1.png) 
+
+```r
 meanTotSteps <- mean(dfTot$total_steps,na.rm=TRUE)
 medianTotSteps <- median(dfTot$total_steps,na.rm=TRUE)
 ```
 
 *Although we are ignoring the NA values, they have to be removed to get mean and median.  
-The mean total number of steps per day is `r format(meanTotSteps,scientific=FALSE)`.  
-The median total number of steps per day is `r format(medianTotSteps,scientific=FALSE)`.*
+The mean total number of steps per day is 10766.19.  
+The median total number of steps per day is 10765.*
 
 ## What is the average daily activity pattern?
 
@@ -57,12 +64,18 @@ Which 5-minute interval, on average across all the days in the dataset, contains
 The mean calculation in dplyr would only work if I removed steps with NA as values.  
 I used a base plot of type "l" for the time series plot.*
 
-```{r avgdaily,echo=TRUE}
+
+```r
 dfInt <- dfAct %>% group_by(interval) %>% filter(steps!='NA') %>% summarise(mean_steps=mean(steps))
 with(dfInt,plot(interval, mean_steps, type="l",main="Average Steps By 5 Minute Interval",xlab="5 Minute Interval", ylab="Mean Steps"))
+```
+
+![plot of chunk avgdaily](figure/avgdaily-1.png) 
+
+```r
 maxSteps <- with(dfInt,interval[mean_steps==max(mean_steps)])
 ```
-*The 5 minute interval with the maximum number of steps is `r maxSteps`, which you can see on the graph above.*
+*The 5 minute interval with the maximum number of steps is 835, which you can see on the graph above.*
 
 ## Imputing missing values
 
@@ -70,12 +83,13 @@ Note that there are a number of days/intervals where there are missing values (c
 
 Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs).
 
-```{r countmissing,echo=TRUE}
+
+```r
 dfNAOnly <- dfAct %>% filter(is.na(steps))
 totalMissing <- dim(dfNAOnly)[1]
 ```
 *I used a dplyr filter to get just the NA value records.  
-The total number of missing values in the dataset is `r totalMissing`.*
+The total number of missing values in the dataset is 2304.*
 
 Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc. Create a new dataset that is equal to the original dataset but with the missing data filled in.
 
@@ -83,7 +97,8 @@ Devise a strategy for filling in all of the missing values in the dataset. The s
 data frame above).  I struggled with this a bit, but found a good discussion in the forum [here](https://class.coursera.org/repdata-014/forum/thread?thread_id=78),  
 which suggested a combination of cbind and dplyr.*
 
-```{r replacemissing,echo=TRUE}
+
+```r
 dfActAdj <- cbind(dfAct,dfInt$mean_steps)
 colnames(dfActAdj)[4]<-"mean_steps"
 dfActAdj <- dfActAdj %>% mutate(mean_steps=round(mean_steps)) %>% mutate(steps=ifelse(is.na(steps),mean_steps,steps))
@@ -94,19 +109,25 @@ Make a histogram of the total number of steps taken each day and Calculate and r
 *Just like the histogram above, I use dplyr group_by and summarise to get the total steps per day.  
 and a base histogram with an arbitrary number of breaks to show frequency of total steps.*
 
-```{r totaladjusted,echo=TRUE}
+
+```r
 dfTotAdj <- dfActAdj %>% group_by(date) %>% summarise(total_steps=sum(steps))
 with(dfTotAdj,hist(total_steps,breaks=22,col="blue",main="Total Steps Frequency (NA Adjusted)",xlab="Total Steps",ylab="Frequency"))
+```
+
+![plot of chunk totaladjusted](figure/totaladjusted-1.png) 
+
+```r
 meanTotAdjSteps <- mean(dfTotAdj$total_steps)
 medianTotAdjSteps <- median(dfTotAdj$total_steps)
 ```
 *The mean/median for the unadjusted data is as follows:    
-- The mean total number of steps per day is `r format(meanTotSteps,scientific=FALSE)`.  
-- The median total number of steps per day is `r format(medianTotSteps,scientific=FALSE)`.* 
+- The mean total number of steps per day is 10766.19.  
+- The median total number of steps per day is 10765.* 
 
 *The mean/median for the NA adjusted data is here:  
-- The mean total number of steps per day is `r format(meanTotAdjSteps,scientific=FALSE)`.  
-- The median total number of steps per day is `r format(medianTotAdjSteps,scientific=FALSE)`.*
+- The mean total number of steps per day is 10765.64.  
+- The median total number of steps per day is 10762.*
 
 *The mean and median for the NA adjusted data have decreased slightly.*
 
@@ -118,7 +139,8 @@ Create a new factor variable in the dataset with two levels - "weekday" and "wee
 *Again, using dplyr and mutate, I added the day column to the adjusted data using the weekdays function,  
 and then added the weekday/weekend factor as a column called day_type.*
 
-```{r addingfactor,echo=TRUE}
+
+```r
 dfActAdj <- dfActAdj %>% mutate(day=weekdays(as.Date(date))) %>% mutate(day_type=ifelse(day %in% c("Saturday","Sunday"),"weekend","weekday"))
 ```
 
@@ -127,11 +149,14 @@ Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minut
 *I used dplyr to group by day_type and interval, then summarise for mean steps.  
 The example plot in the assignment was made with lattice, so I did the same.*
 
-```{r plotbyfactor,echo=TRUE}
+
+```r
 dfIntAdj <- dfActAdj %>% group_by(interval,day_type) %>% summarise(mean_steps=mean(steps))
 library(lattice)
 p <- xyplot(mean_steps ~ interval | day_type, type="l", data = dfIntAdj, layout = c(1,2), main="Average Steps per 5 Minute Interval: Weekend vs. Weekday", xlab="5 Minute Interval", ylab="Mean Steps")
 print(p)
 ```
+
+![plot of chunk plotbyfactor](figure/plotbyfactor-1.png) 
 
 *Thanks for reviewing this assignment!*
