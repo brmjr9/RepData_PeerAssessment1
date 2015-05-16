@@ -101,12 +101,12 @@ meanTotAdjSteps <- mean(dfTotAdj$total_steps)
 medianTotAdjSteps <- median(dfTotAdj$total_steps)
 ```
 *The mean/median for the unadjusted data is as follows:    
-- The mean total number of steps per day is `r format(meanTotSteps,scientific=FALSE)`.  
-- The median total number of steps per day is `r format(medianTotSteps,scientific=FALSE)`.* 
+The mean total number of steps per day is `r format(meanTotSteps,scientific=FALSE)`.  
+The median total number of steps per day is `r format(medianTotSteps,scientific=FALSE)`.* 
 
 *The mean/median for the NA adjusted data is here:  
-- The mean total number of steps per day is `r format(meanTotAdjSteps,scientific=FALSE)`.  
-- The median total number of steps per day is `r format(medianTotAdjSteps,scientific=FALSE)`.*
+The mean total number of steps per day is `r format(meanTotAdjSteps,scientific=FALSE)`.  
+The median total number of steps per day is `r format(medianTotAdjSteps,scientific=FALSE)`.*
 
 *The mean and median for the NA adjusted data have decreased slightly.*
 

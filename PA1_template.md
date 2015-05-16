@@ -122,12 +122,12 @@ meanTotAdjSteps <- mean(dfTotAdj$total_steps)
 medianTotAdjSteps <- median(dfTotAdj$total_steps)
 ```
 *The mean/median for the unadjusted data is as follows:    
-- The mean total number of steps per day is 10766.19.  
-- The median total number of steps per day is 10765.* 
+The mean total number of steps per day is 10766.19.  
+The median total number of steps per day is 10765.* 
 
 *The mean/median for the NA adjusted data is here:  
-- The mean total number of steps per day is 10765.64.  
-- The median total number of steps per day is 10762.*
+The mean total number of steps per day is 10765.64.  
+The median total number of steps per day is 10762.*
 
 *The mean and median for the NA adjusted data have decreased slightly.*
 
